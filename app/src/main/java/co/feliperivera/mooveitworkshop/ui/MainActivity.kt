@@ -1,4 +1,4 @@
-package co.feliperivera.mooveitworkshop.views
+package co.feliperivera.mooveitworkshop.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

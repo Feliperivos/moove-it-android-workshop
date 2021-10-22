@@ -2,8 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
+    android:background="#F8F8F8"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view"

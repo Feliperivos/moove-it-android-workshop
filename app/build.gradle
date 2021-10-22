@@ -15,7 +15,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "co.feliperivera.mooveitworkshop.CustomTestRunner"
     }
 
     buildFeatures {
@@ -46,11 +46,15 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
     implementation 'com.google.dagger:hilt-android:2.39.1'
     kapt 'com.google.dagger:hilt-compiler:2.39.1'
     androidTestImplementation  'com.google.dagger:hilt-android-testing:2.39.1'
     kaptAndroidTest 'com.google.dagger:hilt-compiler:2.39.1'
     testImplementation 'com.google.dagger:hilt-android-testing:2.39.1'
+    androidTestAnnotationProcessor 'com.google.dagger:hilt-android-compiler:2.39.1'
     kaptTest 'com.google.dagger:hilt-compiler:2.39.1'
     implementation 'androidx.room:room-runtime:2.4.0-beta01'
     annotationProcessor 'androidx.room:room-compiler:2.4.0-beta01'
@@ -68,8 +72,8 @@ dependencies {
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
-
-
+    androidTestImplementation 'androidx.test.ext:truth:1.4.0'
+    androidTestImplementation "com.google.truth:truth:1.1.3"
 
 }
 

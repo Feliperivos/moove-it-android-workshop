@@ -1,4 +1,4 @@
-package co.feliperivera.mooveitworkshop.viewmodels
+package co.feliperivera.mooveitworkshop.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

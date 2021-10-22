@@ -26,12 +26,16 @@ class MovieRemoteMediator @Inject constructor(
     ): MediatorResult {
         val query = "movie"
         return try {
-            val page = when (loadType) {
-                LoadType.REFRESH -> 1
+            var page = 0
+            when (loadType) {
+                LoadType.REFRESH -> page = 1
                 LoadType.PREPEND ->
                     return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
-                    remoteKeyDao.remoteKeyByQuery(query)
+                    var remoteKey: Int? = remoteKeyDao.remoteKeyByQuery(query)
+                    if(remoteKey != null){
+                        page = remoteKey
+                    }
                 }
             }
             val response = webService.getPopularMovies(page)
@@ -39,15 +43,21 @@ class MovieRemoteMediator @Inject constructor(
                 movieDao.clearAll()
                 remoteKeyDao.deleteByQuery(query)
             }
-            remoteKeyDao.insertOrReplace(
-                RemoteKey(query, page + 1 )
-            )
+            if(response.results.isEmpty()){
+                MediatorResult.Success(
+                    endOfPaginationReached = true
+                )
+            }else{
+                remoteKeyDao.insertOrReplace(
+                    RemoteKey(query, page + 1 )
+                )
 
-            movieDao.insertAll(response.results)
+                movieDao.insertAll(response.results)
 
-            MediatorResult.Success(
-                endOfPaginationReached = false
-            )
+                MediatorResult.Success(
+                    endOfPaginationReached = false
+                )
+            }
         } catch (e: IOException) {
             MediatorResult.Error(e)
         } catch (e: HttpException) {

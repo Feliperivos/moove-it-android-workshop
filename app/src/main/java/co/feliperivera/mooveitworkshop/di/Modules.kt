@@ -22,16 +22,6 @@ import javax.inject.Singleton
 class Modules {
 
     @Provides
-    fun provideWebService(okHttpClient: OkHttpClient) : WebService {
-        return Retrofit.Builder()
-            .baseUrl("https://api.themoviedb.org/3/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-            .create(WebService::class.java)
-    }
-
-    @Provides
     fun provideAuthInterceptorOkHttpClient(
     ): OkHttpClient {
         val logging = HttpLoggingInterceptor();

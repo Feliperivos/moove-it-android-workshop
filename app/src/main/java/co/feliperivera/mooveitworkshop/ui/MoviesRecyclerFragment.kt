@@ -1,4 +1,4 @@
-package co.feliperivera.mooveitworkshop.views
+package co.feliperivera.mooveitworkshop.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,10 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.paging.ExperimentalPagingApi
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import co.feliperivera.mooveitworkshop.databinding.FragmentRecyclerBinding
-import co.feliperivera.mooveitworkshop.viewmodels.MovieViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,7 +25,7 @@ class MoviesRecyclerFragment : Fragment() {
         FragmentRecyclerBinding.inflate(inflater)
         _binding = FragmentRecyclerBinding.inflate(inflater, container, false)
 
-        with(binding.root) {
+        with(binding.list) {
             val pagingAdapter = MovieRecyclerViewAdapter(MovieComparator)
             adapter = pagingAdapter
             localModel.mostPopularMovies.observe(viewLifecycleOwner) { pagingData ->

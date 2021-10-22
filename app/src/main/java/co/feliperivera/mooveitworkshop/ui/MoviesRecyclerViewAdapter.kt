@@ -1,9 +1,7 @@
-package co.feliperivera.mooveitworkshop.views
+package co.feliperivera.mooveitworkshop.ui
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.get
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
