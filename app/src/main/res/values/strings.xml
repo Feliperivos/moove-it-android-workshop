@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Moove It Workshop</string>
     <string name="movies">Movies</string>
+    <string name="show_reviews">Show Reviews</string>
 </resources>

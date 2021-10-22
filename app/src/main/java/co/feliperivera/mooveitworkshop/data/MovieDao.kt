@@ -16,4 +16,17 @@ interface MovieDao {
 
     @Query("DELETE FROM movie")
     suspend fun clearAll()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMovieGenres(genres: List<MovieGenre>)
+
+    @Query("DELETE FROM movie_genre")
+    suspend fun clearAllGenres()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMovieGenresRelations(genres: List<MoviesToGenres>)
+
+    @Query("DELETE FROM movies_genres_relation")
+    suspend fun clearAllGenresRelations()
+
 }

@@ -41,7 +41,11 @@ class MovieRemoteMediator @Inject constructor(
             val response = webService.getPopularMovies(page)
             if (loadType == LoadType.REFRESH) {
                 movieDao.clearAll()
+                movieDao.clearAllGenres()
+                movieDao.clearAllGenresRelations()
                 remoteKeyDao.deleteByQuery(query)
+                val genresResponse = webService.getMovieGenres()
+                movieDao.insertMovieGenres(genresResponse.genres)
             }
             if(response.results.isEmpty()){
                 MediatorResult.Success(
