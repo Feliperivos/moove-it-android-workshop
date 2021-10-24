@@ -6,20 +6,22 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import co.feliperivera.mooveitworkshop.MovieFactory
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
-import com.google.common.truth.Truth.*
 
 
 @RunWith(AndroidJUnit4::class)
 class MyDatabaseTest {
     private lateinit var movieDao: MovieDao
     private lateinit var remoteKeyDao: RemoteKeyDao
+    private lateinit var stateDao: StateDao
     private lateinit var db: MyDatabase
+
     private lateinit var movieFactory: MovieFactory
     private lateinit var mockMovies: MutableList<Movie>
 
@@ -30,6 +32,7 @@ class MyDatabaseTest {
             context, MyDatabase::class.java).build()
         movieDao = db.movieDao()
         remoteKeyDao = db.remoteKeyDao()
+        stateDao = db.stateDao()
         movieFactory = MovieFactory()
         mockMovies = mutableListOf<Movie>()
         mockMovies.add(movieFactory.createMovie())
@@ -101,6 +104,56 @@ class MyDatabaseTest {
         remoteKeyDao.deleteByQuery(query)
         val emptyResult: Int? = remoteKeyDao.remoteKeyByQuery(query)
         //System.out.println(emptyResult)
+        assertThat(emptyResult).isNull()
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun writeMovieGenreRelationAndRead() = runBlocking {
+        val genres = listOf(MovieGenre(1, "Drama"))
+        movieDao.insertMovieGenres(genres)
+        movieDao.insertAll(mockMovies)
+        val movieGenresRelations = listOf(MoviesGenresRelations(mockMovies[0].id, genres[0].id))
+        movieDao.insertMovieGenresRelations(movieGenresRelations)
+        val result = movieDao.getMovieWithGenres(mockMovies[0].id)
+        assertThat(result.genres[0].name).isEqualTo(genres[0].name)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun writeMovieGenreRelationAndDelete() = runBlocking {
+        val genres = listOf(MovieGenre(1, "Drama"))
+        movieDao.insertMovieGenres(genres)
+        movieDao.insertAll(mockMovies)
+        val movieGenresRelations = listOf(MoviesGenresRelations(mockMovies[0].id, genres[0].id))
+        movieDao.insertMovieGenresRelations(movieGenresRelations)
+        val result = movieDao.getMovieWithGenres(mockMovies[0].id)
+        assertThat(result.genres[0].name).isEqualTo(genres[0].name)
+
+        movieDao.clearAllGenresRelations()
+        val movieWithNoGenres = movieDao.getMovieWithGenres(mockMovies[0].id)
+        assertThat(movieWithNoGenres.genres).isEmpty()
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun writeStateAndRead() = runBlocking {
+        val state = State("key", "value")
+        stateDao.insertOrReplace(state)
+        val result = stateDao.stateByQuery(state.state_key)
+        assertThat(result).isEqualTo(state.value)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun writeStateAndDelete() = runBlocking {
+        val state = State("key", "value")
+        stateDao.insertOrReplace(state)
+        val result = stateDao.stateByQuery(state.state_key)
+        assertThat(result).isEqualTo(state.value)
+
+        stateDao.deleteByQuery(state.state_key)
+        val emptyResult: String? = stateDao.stateByQuery(state.state_key)
         assertThat(emptyResult).isNull()
     }
 }

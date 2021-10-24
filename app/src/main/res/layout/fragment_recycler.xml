@@ -8,7 +8,7 @@
 
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/movies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
@@ -17,6 +17,7 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:transitionName="title_transition_b"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,7 +26,7 @@
         android:layout_height="0dp"
         android:layout_margin="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/movies"
         app:layoutManager="GridLayoutManager"
         app:spanCount="2" />
 

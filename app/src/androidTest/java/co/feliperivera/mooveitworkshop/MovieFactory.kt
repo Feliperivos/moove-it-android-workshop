@@ -13,7 +13,9 @@ class MovieFactory {
             release_date = "2008-12-$id",
             poster_path = "",
             popularity = id.toFloat() * (-1),
-            vote_average = 9.8f
+            vote_average = 9.8f,
+            overview = "Overview",
+            backdrop_path = null
         )
     }
 }

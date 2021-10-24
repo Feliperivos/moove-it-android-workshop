@@ -1,5 +1,6 @@
 package co.feliperivera.mooveitworkshop.data
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 
@@ -14,6 +15,10 @@ interface MovieDao {
     @Query("SELECT * FROM movie ORDER BY popularity DESC")
     fun getMostPopularMovies(): PagingSource<Int, Movie>
 
+    @Transaction
+    @Query("SELECT * FROM movie WHERE id = :id")
+    suspend fun getMovieWithGenres(id: Int? = 0): MovieWithGenres
+
     @Query("DELETE FROM movie")
     suspend fun clearAll()
 
@@ -24,7 +29,7 @@ interface MovieDao {
     suspend fun clearAllGenres()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMovieGenresRelations(genres: List<MoviesToGenres>)
+    suspend fun insertMovieGenresRelations(genres: List<MoviesGenresRelations>)
 
     @Query("DELETE FROM movies_genres_relation")
     suspend fun clearAllGenresRelations()

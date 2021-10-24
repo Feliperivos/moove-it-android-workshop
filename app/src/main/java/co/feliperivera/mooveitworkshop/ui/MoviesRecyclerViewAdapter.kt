@@ -1,7 +1,10 @@
 package co.feliperivera.mooveitworkshop.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.ViewCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -10,7 +13,8 @@ import co.feliperivera.mooveitworkshop.databinding.ListLayoutBinding
 import com.squareup.picasso.Picasso
 
 class MovieRecyclerViewAdapter(
-    diffCallback: DiffUtil.ItemCallback<Movie>
+    diffCallback: DiffUtil.ItemCallback<Movie>,
+    private val onItemClicked: (id: Int, view: View) -> Unit
 ) : PagingDataAdapter<Movie, MovieRecyclerViewAdapter.ViewHolder>(diffCallback){
 
     private val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w185"
@@ -29,6 +33,7 @@ class MovieRecyclerViewAdapter(
         val item: Movie? = getItem(position)
 
         if (item != null) {
+            ViewCompat.setTransitionName(holder.binding.cardView, item.id.toString())
             val movieImagePath = IMAGE_BASE_URL + item.poster_path
             holder.binding.movieTitle.text = item.title
             holder.binding.movieYear.text = item.release_date?.take(4) ?: ""
@@ -38,6 +43,9 @@ class MovieRecyclerViewAdapter(
                 .fit()
                 .centerInside()
                 .into(holder.binding.imageView)
+            holder.binding.cardView.setOnClickListener {
+                onItemClicked(item.id, holder.binding.cardView)
+            }
         }
     }
 

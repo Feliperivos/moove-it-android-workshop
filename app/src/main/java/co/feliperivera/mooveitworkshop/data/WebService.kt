@@ -11,9 +11,10 @@ interface WebService {
     @GET("genre/movie/list")
     suspend fun getMovieGenres() : GenreResponse
 
-    @GET("movie/{movie_id}")
-    suspend fun getMovieDetails(@Path("movie_id") id: Int) : Movie
+    @GET("movie/{movie_id}/videos")
+    suspend fun getMovieVideos(@Path("movie_id") movieId: Int): BaseResponse<Videos>
 
     data class BaseResponse<T>(val results: List<T>)
     data class GenreResponse(val genres: List<MovieGenre>)
+    data class Videos(val site: String, val key: String )
 }

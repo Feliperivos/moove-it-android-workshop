@@ -14,11 +14,12 @@ import javax.inject.Inject
 @OptIn(ExperimentalPagingApi::class)
 class MovieRemoteMediator @Inject constructor(
     private val db: MyDatabase,
-    private val movieDao: MovieDao,
-    private val remoteKeyDao: RemoteKeyDao,
-    private val webService: WebService
+    private val webService: WebService,
 
 ): RemoteMediator<Int, Movie>() {
+
+    val cacheTimeout = TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS)
+    val lastUpdatedKey = "last_updated"
 
     override suspend fun load(
         loadType: LoadType,
@@ -32,7 +33,7 @@ class MovieRemoteMediator @Inject constructor(
                 LoadType.PREPEND ->
                     return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
-                    var remoteKey: Int? = remoteKeyDao.remoteKeyByQuery(query)
+                    var remoteKey: Int? = db.remoteKeyDao().remoteKeyByQuery(query)
                     if(remoteKey != null){
                         page = remoteKey
                     }
@@ -40,23 +41,38 @@ class MovieRemoteMediator @Inject constructor(
             }
             val response = webService.getPopularMovies(page)
             if (loadType == LoadType.REFRESH) {
-                movieDao.clearAll()
-                movieDao.clearAllGenres()
-                movieDao.clearAllGenresRelations()
-                remoteKeyDao.deleteByQuery(query)
+                db.movieDao().clearAll()
+                db.movieDao().clearAllGenres()
+                db.movieDao().clearAllGenresRelations()
+                db.remoteKeyDao().deleteByQuery(query)
                 val genresResponse = webService.getMovieGenres()
-                movieDao.insertMovieGenres(genresResponse.genres)
+                db.movieDao().insertMovieGenres(genresResponse.genres)
             }
             if(response.results.isEmpty()){
                 MediatorResult.Success(
                     endOfPaginationReached = true
                 )
             }else{
-                remoteKeyDao.insertOrReplace(
+                db.remoteKeyDao().insertOrReplace(
                     RemoteKey(query, page + 1 )
                 )
 
-                movieDao.insertAll(response.results)
+                val moviesGenresRelations = mutableListOf<MoviesGenresRelations>()
+                response.results.forEach { movie ->
+                    movie.genre_ids.forEach { genreId ->
+                        moviesGenresRelations.add(MoviesGenresRelations(movie.id, genreId))
+                    }
+                    val videosResponse = webService.getMovieVideos(movie.id)
+                    for(video in videosResponse.results){
+                        if(video.site == "YouTube"){
+                            movie.video_key = video.key
+                            break
+                        }
+                    }
+                }
+                db.movieDao().insertAll(response.results)
+                db.movieDao().insertMovieGenresRelations(moviesGenresRelations)
+                db.stateDao().insertOrReplace(State(lastUpdatedKey, System.currentTimeMillis().toString()))
 
                 MediatorResult.Success(
                     endOfPaginationReached = false
@@ -67,23 +83,16 @@ class MovieRemoteMediator @Inject constructor(
         } catch (e: HttpException) {
             MediatorResult.Error(e)
         }
-
     }
 
-    /*override suspend fun initialize(): InitializeAction {
-        val cacheTimeout = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS)
-        return if (System.currentTimeMillis() - db.lastUpdated() >= cacheTimeout)
-        {
-            // Cached data is up-to-date, so there is no need to re-fetch
-            // from the network.
+    override suspend fun initialize(): InitializeAction {
+        val lastUpdated: String? = db.stateDao().stateByQuery(lastUpdatedKey)
+        return if(lastUpdated != null && (System.currentTimeMillis() - lastUpdated.toLong()) <= cacheTimeout){
             InitializeAction.SKIP_INITIAL_REFRESH
-        } else {
-            // Need to refresh cached data from network; returning
-            // LAUNCH_INITIAL_REFRESH here will also block RemoteMediator's
-            // APPEND and PREPEND from running until REFRESH succeeds.
+        }else{
             InitializeAction.LAUNCH_INITIAL_REFRESH
         }
-    }*/
+    }
 
 
 

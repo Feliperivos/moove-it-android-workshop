@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import co.feliperivera.mooveitworkshop.MockWebService
 import co.feliperivera.mooveitworkshop.MovieFactory
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -14,7 +15,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
-import com.google.common.truth.Truth.*
 
 @ExperimentalPagingApi
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -25,14 +25,13 @@ class MovieRemoteMediatorTest{
     private lateinit var remoteKeyDao: RemoteKeyDao
     private lateinit var db: MyDatabase
     private lateinit var mockWebService: MockWebService
+    private lateinit var stateDao: StateDao
 
     @Before
     fun initialize() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(
             context, MyDatabase::class.java).build()
-        movieDao = db.movieDao()
-        remoteKeyDao = db.remoteKeyDao()
         mockWebService = MockWebService()
     }
 
@@ -46,7 +45,7 @@ class MovieRemoteMediatorTest{
     fun refreshLoadReturnsSuccessResultWhenMoreDataIsPresent() = runBlocking {
         val movieFactory = MovieFactory()
         mockWebService.addMovies(movieFactory.createMovie())
-        val remoteMediator = MovieRemoteMediator(db,db.movieDao(),db.remoteKeyDao(),mockWebService)
+        val remoteMediator = MovieRemoteMediator(db,mockWebService)
         val pagingState = PagingState<Int, Movie>(
             listOf(),
             null,
@@ -60,7 +59,7 @@ class MovieRemoteMediatorTest{
 
     @Test
     fun refreshLoadSuccessAndEndOfPaginationWhenNoMoreData() = runBlocking {
-        val remoteMediator = MovieRemoteMediator(db,db.movieDao(),db.remoteKeyDao(),mockWebService)
+        val remoteMediator = MovieRemoteMediator(db,mockWebService)
         val pagingState = PagingState<Int, Movie>(
             listOf(),
             null,
@@ -75,7 +74,7 @@ class MovieRemoteMediatorTest{
     @Test
     fun refreshLoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
         mockWebService.failureMsg = "Throw test failure"
-        val remoteMediator = MovieRemoteMediator(db,db.movieDao(),db.remoteKeyDao(),mockWebService)
+        val remoteMediator = MovieRemoteMediator(db,mockWebService)
         val pagingState = PagingState<Int, Movie>(
             listOf(),
             null,

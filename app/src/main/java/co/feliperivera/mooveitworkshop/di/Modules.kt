@@ -2,10 +2,7 @@ package co.feliperivera.mooveitworkshop.di
 
 import android.content.Context
 import androidx.room.Room
-import co.feliperivera.mooveitworkshop.data.MovieDao
-import co.feliperivera.mooveitworkshop.data.MyDatabase
-import co.feliperivera.mooveitworkshop.data.RemoteKeyDao
-import co.feliperivera.mooveitworkshop.data.WebService
+import co.feliperivera.mooveitworkshop.data.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,10 +19,30 @@ import javax.inject.Singleton
 class Modules {
 
     @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext appContext: Context) : MyDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            MyDatabase::class.java,
+            "mooveitworkshop.db"
+        ).build()
+    }
+
+    @Provides
+    fun provideWebService(okHttpClient: OkHttpClient) : WebService {
+        return Retrofit.Builder()
+            .baseUrl("https://api.themoviedb.org/3/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(WebService::class.java)
+    }
+
+    @Provides
     fun provideAuthInterceptorOkHttpClient(
     ): OkHttpClient {
-        val logging = HttpLoggingInterceptor();
-        logging.level = HttpLoggingInterceptor.Level.BASIC
+        val logging = HttpLoggingInterceptor()
+        logging.level = HttpLoggingInterceptor.Level.NONE
 
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -43,16 +60,6 @@ class Modules {
     }
 
     @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext appContext: Context) : MyDatabase {
-        return Room.databaseBuilder(
-            appContext,
-            MyDatabase::class.java,
-            "mooveitworkshop.db"
-        ).build()
-    }
-
-    @Provides
     fun provideMovieDao(database: MyDatabase) : MovieDao {
         return database.movieDao()
     }
@@ -60,5 +67,10 @@ class Modules {
     @Provides
     fun provideRemoteKeyDao(database: MyDatabase) : RemoteKeyDao {
         return database.remoteKeyDao()
+    }
+
+    @Provides
+    fun provideStateDao(database: MyDatabase) : StateDao {
+        return database.stateDao()
     }
 }
