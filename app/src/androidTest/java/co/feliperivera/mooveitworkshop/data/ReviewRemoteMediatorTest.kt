@@ -11,8 +11,10 @@ import co.feliperivera.mooveitworkshop.data.dao.MovieDao
 import co.feliperivera.mooveitworkshop.data.dao.RemoteKeyDao
 import co.feliperivera.mooveitworkshop.data.dao.StateDao
 import co.feliperivera.mooveitworkshop.data.entities.Movie
+import co.feliperivera.mooveitworkshop.data.entities.Review
 import co.feliperivera.mooveitworkshop.data.remotemediators.MovieRemoteMediator
-import com.google.common.truth.Truth.assertThat
+import co.feliperivera.mooveitworkshop.data.remotemediators.ReviewRemoteMediator
+import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -24,13 +26,10 @@ import java.io.IOException
 @ExperimentalPagingApi
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-class MovieRemoteMediatorTest{
+class ReviewRemoteMediatorTest{
 
-    private lateinit var movieDao: MovieDao
-    private lateinit var remoteKeyDao: RemoteKeyDao
     private lateinit var db: MyDatabase
     private lateinit var mockWebService: MockWebService
-    private lateinit var stateDao: StateDao
 
     @Before
     fun initialize() {
@@ -49,44 +48,44 @@ class MovieRemoteMediatorTest{
     @Test
     fun refreshLoadReturnsSuccessResultWhenMoreDataIsPresent() = runBlocking {
         val movieFactory = MovieFactory()
-        mockWebService.addMovies(movieFactory.createMovie())
-        val remoteMediator = MovieRemoteMediator(db,mockWebService)
-        val pagingState = PagingState<Int, Movie>(
+        mockWebService.addReviews(Review("1","name","content", "createDate"))
+        val remoteMediator = ReviewRemoteMediator(1,db,mockWebService)
+        val pagingState = PagingState<Int, Review>(
             listOf(),
             null,
             PagingConfig(1),
             0
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
-        assertThat(result is RemoteMediator.MediatorResult.Success).isTrue()
-        assertThat((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached).isFalse()
+        Truth.assertThat(result is RemoteMediator.MediatorResult.Success).isTrue()
+        Truth.assertThat((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached).isFalse()
     }
 
     @Test
     fun refreshLoadSuccessAndEndOfPaginationWhenNoMoreData() = runBlocking {
-        val remoteMediator = MovieRemoteMediator(db,mockWebService)
-        val pagingState = PagingState<Int, Movie>(
+        val remoteMediator = ReviewRemoteMediator(1,db,mockWebService)
+        val pagingState = PagingState<Int, Review>(
             listOf(),
             null,
             PagingConfig(1),
             0
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
-        assertThat(result is RemoteMediator.MediatorResult.Success).isTrue()
-        assertThat((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached).isTrue()
+        Truth.assertThat(result is RemoteMediator.MediatorResult.Success).isTrue()
+        Truth.assertThat((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached).isTrue()
     }
 
     @Test
     fun refreshLoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
         mockWebService.failureMsg = "Throw test failure"
-        val remoteMediator = MovieRemoteMediator(db,mockWebService)
-        val pagingState = PagingState<Int, Movie>(
+        val remoteMediator = ReviewRemoteMediator(1,db,mockWebService)
+        val pagingState = PagingState<Int, Review>(
             listOf(),
             null,
             PagingConfig(1),
             0
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
-        assertThat(result is RemoteMediator.MediatorResult.Error).isTrue()
+        Truth.assertThat(result is RemoteMediator.MediatorResult.Error).isTrue()
     }
 }

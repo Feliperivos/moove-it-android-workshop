@@ -3,6 +3,9 @@ package co.feliperivera.mooveitworkshop.di
 import android.content.Context
 import androidx.room.Room
 import co.feliperivera.mooveitworkshop.data.*
+import co.feliperivera.mooveitworkshop.data.dao.MovieDao
+import co.feliperivera.mooveitworkshop.data.dao.RemoteKeyDao
+import co.feliperivera.mooveitworkshop.data.dao.StateDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -71,6 +74,11 @@ class Modules {
 
     @Provides
     fun provideStateDao(database: MyDatabase) : StateDao {
+        return database.stateDao()
+    }
+
+    @Provides
+    fun provideReviewDao(database: MyDatabase) : StateDao {
         return database.stateDao()
     }
 }

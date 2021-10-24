@@ -1,4 +1,4 @@
-package co.feliperivera.mooveitworkshop.data
+package co.feliperivera.mooveitworkshop.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

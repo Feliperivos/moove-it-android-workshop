@@ -24,10 +24,6 @@ class MainActivityTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
-    @Before
-    fun init() {
-    }
-
     @Test
     fun showMovieTitle() {
         onView(withId(R.id.movies)).check(matches(isDisplayed()))
@@ -54,5 +50,28 @@ class MainActivityTest {
                 .actionOnItemAtPosition<MovieRecyclerViewAdapter.ViewHolder>(0,click()))
         onView(withId(R.id.back_button)).check(matches(isDisplayed())).perform(click())
         onView(withId(R.id.movies)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun clickOnReviewsButtonAndOpenReviewsFragment() {
+        onView(withId(R.id.list))
+            .perform(RecyclerViewActions
+                .actionOnItemAtPosition<MovieRecyclerViewAdapter.ViewHolder>(0,click()))
+        onView(withId(R.id.reviews_button)).check(matches(isDisplayed())).perform(click())
+        onView(withId(R.id.list_reviews)).check(matches(isDisplayed()))
+        onView(withId(R.id.poster)).check(matches(isDisplayed()))
+        onView(withId(R.id.review_title)).check(matches(isDisplayed()))
+        onView(withId(R.id.back_button)).check(matches(isDisplayed()))
+    }
+
+
+    @Test
+    fun clickOnBackButtonOnReviewFragment() {
+        onView(withId(R.id.list))
+            .perform(RecyclerViewActions
+                .actionOnItemAtPosition<MovieRecyclerViewAdapter.ViewHolder>(0,click()))
+        onView(withId(R.id.reviews_button)).check(matches(isDisplayed())).perform(click())
+        onView(withId(R.id.back_button)).check(matches(isDisplayed())).perform(click())
+        onView(withId(R.id.movie_title)).check(matches(isDisplayed()))
     }
 }

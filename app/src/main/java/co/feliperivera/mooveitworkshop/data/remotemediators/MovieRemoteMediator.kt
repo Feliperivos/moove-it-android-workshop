@@ -1,11 +1,16 @@
-package co.feliperivera.mooveitworkshop.data
+package co.feliperivera.mooveitworkshop.data.remotemediators
 
 import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import androidx.room.Database
+import co.feliperivera.mooveitworkshop.data.MyDatabase
+import co.feliperivera.mooveitworkshop.data.WebService
+import co.feliperivera.mooveitworkshop.data.entities.Movie
+import co.feliperivera.mooveitworkshop.data.entities.MoviesGenresRelations
+import co.feliperivera.mooveitworkshop.data.entities.RemoteKey
+import co.feliperivera.mooveitworkshop.data.entities.State
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -16,7 +21,7 @@ class MovieRemoteMediator @Inject constructor(
     private val db: MyDatabase,
     private val webService: WebService,
 
-): RemoteMediator<Int, Movie>() {
+    ): RemoteMediator<Int, Movie>() {
 
     val cacheTimeout = TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS)
     val lastUpdatedKey = "last_updated"
@@ -86,6 +91,7 @@ class MovieRemoteMediator @Inject constructor(
     }
 
     override suspend fun initialize(): InitializeAction {
+        Log.d("initialize", "Yes")
         val lastUpdated: String? = db.stateDao().stateByQuery(lastUpdatedKey)
         return if(lastUpdated != null && (System.currentTimeMillis() - lastUpdated.toLong()) <= cacheTimeout){
             InitializeAction.SKIP_INITIAL_REFRESH
@@ -93,7 +99,4 @@ class MovieRemoteMediator @Inject constructor(
             InitializeAction.LAUNCH_INITIAL_REFRESH
         }
     }
-
-
-
 }

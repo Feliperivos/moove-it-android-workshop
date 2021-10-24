@@ -1,17 +1,17 @@
 package co.feliperivera.mooveitworkshop.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.os.bundleOf
 import androidx.core.view.doOnPreDraw
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.paging.ExperimentalPagingApi
 import co.feliperivera.mooveitworkshop.R
 import co.feliperivera.mooveitworkshop.databinding.FragmentRecyclerBinding
+import co.feliperivera.mooveitworkshop.ui.viewmodels.MovieViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

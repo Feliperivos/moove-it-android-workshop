@@ -1,8 +1,9 @@
 package co.feliperivera.mooveitworkshop
 
-import co.feliperivera.mooveitworkshop.data.Movie
-import co.feliperivera.mooveitworkshop.data.MovieGenre
+import co.feliperivera.mooveitworkshop.data.entities.Movie
+import co.feliperivera.mooveitworkshop.data.entities.MovieGenre
 import co.feliperivera.mooveitworkshop.data.WebService
+import co.feliperivera.mooveitworkshop.data.entities.Review
 import java.io.IOException
 
 class MockWebService: WebService {
@@ -10,11 +11,16 @@ class MockWebService: WebService {
     private val movies: MutableList<Movie> = mutableListOf<Movie>()
     private val genres: MutableList<MovieGenre> = mutableListOf<MovieGenre>()
     private val videos: MutableList<WebService.Videos> = mutableListOf<WebService.Videos>()
+    private val reviews: MutableList<Review> = mutableListOf<Review>()
 
     var failureMsg: String? = null
 
     fun addMovies(movie: Movie){
         movies.add(movie)
+    }
+
+    fun addReviews(review: Review){
+        reviews.add(review)
     }
 
     override suspend fun getPopularMovies(page: Int): WebService.BaseResponse<Movie> {
@@ -28,7 +34,6 @@ class MockWebService: WebService {
         failureMsg?.let {
             throw IOException(it)
         }
-        System.out.println("genres")
         return WebService.GenreResponse(genres)
     }
 
@@ -36,7 +41,13 @@ class MockWebService: WebService {
         failureMsg?.let {
             throw IOException(it)
         }
-        System.out.println("videos")
         return WebService.BaseResponse(videos)
+    }
+
+    override suspend fun getMovieReviews(movieId: Int, page: Int): WebService.BaseResponse<Review> {
+        failureMsg?.let {
+            throw IOException(it)
+        }
+        return WebService.BaseResponse(reviews)
     }
 }

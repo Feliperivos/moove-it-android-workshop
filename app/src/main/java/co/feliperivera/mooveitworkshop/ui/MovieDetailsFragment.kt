@@ -7,23 +7,20 @@ import android.view.ViewGroup
 import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
 import androidx.transition.TransitionInflater
 import co.feliperivera.mooveitworkshop.R
 import co.feliperivera.mooveitworkshop.databinding.FragmentMovieDetailBinding
+import co.feliperivera.mooveitworkshop.ui.viewmodels.MovieViewModel
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-
-
-
-
 
 @AndroidEntryPoint
 class MovieDetailsFragment: Fragment() {
 
-    private val localModel : MovieViewModel by activityViewModels()
+    private val activityModel : MovieViewModel by activityViewModels()
     private var _binding: FragmentMovieDetailBinding? = null
     private val binding get() = _binding!!
     private val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"
@@ -34,10 +31,26 @@ class MovieDetailsFragment: Fragment() {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition = TransitionInflater.from(requireContext())
             .inflateTransition(R.transition.basic_transition)
-        localModel.movieId.observe(this) {  id ->
-            localModel.getMovieDetails(id)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        FragmentMovieDetailBinding.inflate(inflater)
+        _binding = FragmentMovieDetailBinding.inflate(inflater, container, false)
+
+        binding.backButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
         }
-        localModel.currentMovie.observe(this) {  movie ->
+        binding.reviewsButton.setOnClickListener {
+            openMovieReviewsFragment()
+        }
+
+        activityModel.movieId.observe(viewLifecycleOwner) {  id ->
+            activityModel.getMovieDetails(id)
+        }
+        activityModel.currentMovie.observe(viewLifecycleOwner) {  movie ->
             binding.movieTitle.text = movie.data.title
             binding.ratingBar.rating = (movie.data.vote_average) / 2
             binding.ratingValue.text = movie.data.vote_average.toString()
@@ -62,13 +75,11 @@ class MovieDetailsFragment: Fragment() {
                     .into(binding.poster)
             }
 
-            binding.backButton.setOnClickListener {
-                parentFragmentManager.popBackStack()
-            }
-            if(movie.data.video_key != null){
-                youtubeVideo = movie.data.video_key!!
+
+            youtubeVideo = if(movie.data.video_key != null){
+                movie.data.video_key!!
             }else {
-                youtubeVideo = ""
+                ""
             }
 
             if(youtubeVideo.isNotEmpty()){
@@ -99,16 +110,18 @@ class MovieDetailsFragment: Fragment() {
             }
         }
 
+        return binding.root
     }
 
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        FragmentMovieDetailBinding.inflate(inflater)
-        _binding = FragmentMovieDetailBinding.inflate(inflater, container, false)
-        return binding.root
+    private fun openMovieReviewsFragment() {
+        val fragment = ReviewsFragment()
+        parentFragmentManager.commit {
+            //setCustomAnimations(...)
+            setReorderingAllowed(true)
+            addSharedElement(binding.poster, getString(R.string.movie_poster_review))
+            replace(R.id.fragment_container_view, fragment)
+            addToBackStack(null)
+        }
     }
 
     override fun onDestroyView() {

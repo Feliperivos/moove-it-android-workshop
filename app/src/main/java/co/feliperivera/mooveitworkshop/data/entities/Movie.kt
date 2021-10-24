@@ -1,4 +1,4 @@
-package co.feliperivera.mooveitworkshop.data
+package co.feliperivera.mooveitworkshop.data.entities
 
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -21,4 +21,5 @@ data class Movie (
     @Ignore
     var genre_ids: List<Int> = listOf<Int>()
     var video_key: String? = null
+    var reviews: Int = 0
 }

@@ -3,12 +3,11 @@ package co.feliperivera.mooveitworkshop.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import co.feliperivera.mooveitworkshop.data.Movie
+import co.feliperivera.mooveitworkshop.data.entities.Movie
 import co.feliperivera.mooveitworkshop.databinding.ListLayoutBinding
 import com.squareup.picasso.Picasso
 

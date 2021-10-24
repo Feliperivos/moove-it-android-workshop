@@ -1,12 +1,12 @@
 package co.feliperivera.mooveitworkshop.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.fragment.app.viewModels
 import co.feliperivera.mooveitworkshop.R
+import co.feliperivera.mooveitworkshop.ui.viewmodels.MovieViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

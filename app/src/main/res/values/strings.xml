@@ -3,5 +3,7 @@
     <string name="movies">Movies</string>
     <string name="show_reviews">Show Reviews</string>
     <string name="back">Back</string>
-    <string name="movie_poster_details">MoviePosterTransition</string>
+    <string name="reviews">Reviews</string>
+    <string name="movie_poster_details">PosterDetailsTransition</string>
+    <string name="movie_poster_review">PosterReviewsTransition</string>
 </resources>

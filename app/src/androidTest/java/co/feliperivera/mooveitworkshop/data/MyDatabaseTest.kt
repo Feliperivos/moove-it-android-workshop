@@ -6,6 +6,11 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import co.feliperivera.mooveitworkshop.MovieFactory
+import co.feliperivera.mooveitworkshop.data.dao.MovieDao
+import co.feliperivera.mooveitworkshop.data.dao.RemoteKeyDao
+import co.feliperivera.mooveitworkshop.data.dao.ReviewDao
+import co.feliperivera.mooveitworkshop.data.dao.StateDao
+import co.feliperivera.mooveitworkshop.data.entities.*
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -20,6 +25,7 @@ class MyDatabaseTest {
     private lateinit var movieDao: MovieDao
     private lateinit var remoteKeyDao: RemoteKeyDao
     private lateinit var stateDao: StateDao
+    private lateinit var reviewDao: ReviewDao
     private lateinit var db: MyDatabase
 
     private lateinit var movieFactory: MovieFactory
@@ -33,6 +39,7 @@ class MyDatabaseTest {
         movieDao = db.movieDao()
         remoteKeyDao = db.remoteKeyDao()
         stateDao = db.stateDao()
+        reviewDao = db.reviewDao()
         movieFactory = MovieFactory()
         mockMovies = mutableListOf<Movie>()
         mockMovies.add(movieFactory.createMovie())
@@ -155,5 +162,43 @@ class MyDatabaseTest {
         stateDao.deleteByQuery(state.state_key)
         val emptyResult: String? = stateDao.stateByQuery(state.state_key)
         assertThat(emptyResult).isNull()
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun writeReviewAndRead() = runBlocking {
+
+        val reviews = listOf(Review("1","name","content", "createDate"))
+        reviewDao.insertAllReviews(reviews)
+        val results = reviewDao.getReviews().load(
+            PagingSource.LoadParams.Refresh(0,1,false)
+        )
+        var expected = PagingSource.LoadResult.Page(
+            reviews,null, null,0,0
+        )
+        assertThat(results).isEqualTo(expected)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun writeReviewAndDelete() = runBlocking {
+        val reviews = listOf(Review("1","name","content", "createDate"))
+        reviewDao.insertAllReviews(reviews)
+        var results = reviewDao.getReviews().load(
+            PagingSource.LoadParams.Refresh(0,1,false)
+        )
+        var expected = PagingSource.LoadResult.Page(
+            reviews,null, null,0,0
+        )
+        assertThat(results).isEqualTo(expected)
+
+        reviewDao.clearAllReviews()
+        results = reviewDao.getReviews().load(
+            PagingSource.LoadParams.Refresh(0,1,false)
+        )
+        expected = PagingSource.LoadResult.Page(
+            mutableListOf<Review>(),null, null,0,0
+        )
+        assertThat(results).isEqualTo(expected)
     }
 }

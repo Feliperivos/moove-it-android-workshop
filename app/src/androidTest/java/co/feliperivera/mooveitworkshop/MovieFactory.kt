@@ -1,6 +1,6 @@
 package co.feliperivera.mooveitworkshop
 
-import co.feliperivera.mooveitworkshop.data.Movie
+import co.feliperivera.mooveitworkshop.data.entities.Movie
 import java.util.concurrent.atomic.AtomicInteger
 
 class MovieFactory {

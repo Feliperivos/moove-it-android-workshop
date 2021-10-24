@@ -1,8 +1,11 @@
-package co.feliperivera.mooveitworkshop.data
+package co.feliperivera.mooveitworkshop.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
+import co.feliperivera.mooveitworkshop.data.entities.Movie
+import co.feliperivera.mooveitworkshop.data.entities.MovieWithGenres
+import co.feliperivera.mooveitworkshop.data.entities.MoviesGenresRelations
+import co.feliperivera.mooveitworkshop.data.entities.MovieGenre
 
 @Dao
 interface MovieDao {
@@ -33,5 +36,8 @@ interface MovieDao {
 
     @Query("DELETE FROM movies_genres_relation")
     suspend fun clearAllGenresRelations()
+
+    @Query("UPDATE movie SET reviews = :reviews WHERE id = :id")
+    suspend fun saveNumberOfReviews(id: Int? = 0, reviews: Int? = 0)
 
 }

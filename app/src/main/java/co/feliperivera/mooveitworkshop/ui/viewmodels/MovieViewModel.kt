@@ -1,14 +1,14 @@
-package co.feliperivera.mooveitworkshop.ui
+package co.feliperivera.mooveitworkshop.ui.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import co.feliperivera.mooveitworkshop.data.Movie
-import co.feliperivera.mooveitworkshop.data.MovieDao
-import co.feliperivera.mooveitworkshop.data.MovieRemoteMediator
-import co.feliperivera.mooveitworkshop.data.MovieWithGenres
+import co.feliperivera.mooveitworkshop.data.dao.MovieDao
+import co.feliperivera.mooveitworkshop.data.entities.Movie
+import co.feliperivera.mooveitworkshop.data.entities.MovieWithGenres
+import co.feliperivera.mooveitworkshop.data.remotemediators.MovieRemoteMediator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,4 +41,8 @@ class MovieViewModel @Inject constructor(
         moviesMediator,
         { movieDao.getMostPopularMovies() }
     ).liveData.cachedIn(this)
+
+
+
+
 }
